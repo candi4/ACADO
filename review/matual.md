@@ -99,4 +99,25 @@ Dynamic : variables and constraints change over time. Use OCP.
 
 
 ## 5. State and parameter estimation
+### 5.1 Tutorial
 
+
+## 6. Process for Closed-Loop Simulations
+* Built-in simulation environment for perfoming realistic closed-loop simulations. 
+* The model used for simulating the process does not need to be the same as specified within the optimal control formulations within
+the controller
+
+### 6.1. Setting up
+How to setup a simple Process for MPC simulations
+
+### 6.2 Advanced features
+In particular, actuator and sensor behaviour can be simulated to yield more realistic results.
+1. Adding an actuator to the process
+    * Noise, delay
+2. Adding a sensor
+    * Noise, delay
+3. Simulation results
+4. Algorithmic options
+
+
+## 7. Controller for Closed-Loop Simulations
