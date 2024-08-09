@@ -1,4 +1,4 @@
-# matual
+# Manual
 Review of `ACADOToolkitUser's Manual`
 
 
@@ -121,3 +121,64 @@ In particular, actuator and sensor behaviour can be simulated to yield more real
 
 
 ## 7. Controller for Closed-Loop Simulations
+Three major blocks
+1. Estimate state/parameter online using output.
+2. Reference trajectory can be provided to the control law.
+3. Class `ControlLaw` (usually `RealTimeAlgorithm`) uses estimated values to compute optimizedc control inputs.
+
+### 7.1. Setting up MPC controller
+How to setup a basic MPC controller
+1. Mathematical Formulation
+2. Implementation
+3. Simulation Results
+4. List of Algorithmic Options
+
+### 7.2. Setting-Up More Classical Feedback Controllers
+1. PID
+2. LQR
+
+
+## 8. Simulation Environment
+### 8.1 Performing a Basic Closed-Loop MPC Simulation
+1. Implementation
+
+
+## 9. Integrators
+### 9.1. Introduction
+### 9.2. Runge Kutta Integrators
+### 9.3. BDF Integrator
+
+
+## 10. Discretization Methods for Dynamic Systems
+work in progress
+## 11. NLP Solvers
+work in progress
+
+
+## 12. Matrices and Vectors
+### 12.1. Getting Started
+```cpp
+Matrix A( 3 , 2 ) ;
+Vector x (2) , b (3) , c ;
+```
+1. Read from ASCII-file
+2. Store into ASCII-file
+
+
+## 13. Time and Variables Grids
+work in progress
+## 14. Differentiable Functions and Expressions
+work in progress
+
+
+## 15. Code Generation
+### 15.1. Introduction
+How to use the ACADO Code Generation tool
+1. Scope
+2. Implemented Algorithms
+3. Code generated ACADO integrators
+4. Limitations regarding the OCP formulations
+### 15.2. Getting Started
+### 15.3. A Closer Look at the Generated Code
+### 15.4. Advanced Functionality
+all available user-options
