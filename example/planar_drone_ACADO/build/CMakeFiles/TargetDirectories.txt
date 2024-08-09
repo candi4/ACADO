@@ -1,0 +1,4 @@
+/home/hammy/planar_drone_20_mpc/build/CMakeFiles/mpc_solver.dir
+/home/hammy/planar_drone_20_mpc/build/CMakeFiles/planar_drone_20.dir
+/home/hammy/planar_drone_20_mpc/build/CMakeFiles/edit_cache.dir
+/home/hammy/planar_drone_20_mpc/build/CMakeFiles/rebuild_cache.dir
