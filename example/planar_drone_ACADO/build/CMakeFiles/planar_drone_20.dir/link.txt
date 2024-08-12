@@ -1,1 +1,1 @@
-/usr/bin/c++ CMakeFiles/planar_drone_20.dir/planar_drone_20.cpp.o -o planar_drone_20  /usr/lib/x86_64-linux-gnu/libpython3.10.so libmpc_solver.a 
+/usr/bin/c++     CMakeFiles/planar_drone_20.dir/planar_drone_20.cpp.o  -o planar_drone_20  /usr/lib/x86_64-linux-gnu/libpython3.8.so libmpc_solver.a 
