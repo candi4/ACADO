@@ -1,3 +1,5 @@
+# acado_manual_test
+
 I resolve issues with some examples in the manual due to minor problems (visualization and outdated notation). 
 
 I also organize all example code from chapters 3 to 8 (except code generation), which are in the `src` folder.
@@ -16,7 +18,9 @@ In addition, please understand how to visualize without using the ACADO visuliza
 
 ## Build
 ```shell
-cd <ACADOtoolkit>/build
+mkdir build
+rm -r build/*
+cd build
 cmake ..
 make
 ```
