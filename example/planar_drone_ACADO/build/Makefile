@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named planar_drone_codegen
+
+# Build rule for target.
+planar_drone_codegen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 planar_drone_codegen
+.PHONY : planar_drone_codegen
+
+# fast build rule for target.
+planar_drone_codegen/fast:
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/build
+.PHONY : planar_drone_codegen/fast
+
+#=============================================================================
 # Target rules for targets named planar_drone_20
 
 # Build rule for target.
@@ -541,6 +554,33 @@ planar_drone_20.cpp.s:
 	$(MAKE) -f CMakeFiles/planar_drone_20.dir/build.make CMakeFiles/planar_drone_20.dir/planar_drone_20.cpp.s
 .PHONY : planar_drone_20.cpp.s
 
+planar_drone_codegen.o: planar_drone_codegen.cpp.o
+
+.PHONY : planar_drone_codegen.o
+
+# target to build an object file
+planar_drone_codegen.cpp.o:
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/planar_drone_codegen.cpp.o
+.PHONY : planar_drone_codegen.cpp.o
+
+planar_drone_codegen.i: planar_drone_codegen.cpp.i
+
+.PHONY : planar_drone_codegen.i
+
+# target to preprocess a source file
+planar_drone_codegen.cpp.i:
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/planar_drone_codegen.cpp.i
+.PHONY : planar_drone_codegen.cpp.i
+
+planar_drone_codegen.s: planar_drone_codegen.cpp.s
+
+.PHONY : planar_drone_codegen.s
+
+# target to generate assembly for a file
+planar_drone_codegen.cpp.s:
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/planar_drone_codegen.cpp.s
+.PHONY : planar_drone_codegen.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -549,6 +589,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... planar_drone_codegen"
 	@echo "... planar_drone_20"
 	@echo "... mpc_solver"
 	@echo "... MPC_SOLVER/acado_auxiliary_functions.o"
@@ -596,6 +637,9 @@ help:
 	@echo "... planar_drone_20.o"
 	@echo "... planar_drone_20.i"
 	@echo "... planar_drone_20.s"
+	@echo "... planar_drone_codegen.o"
+	@echo "... planar_drone_codegen.i"
+	@echo "... planar_drone_codegen.s"
 .PHONY : help
 
 

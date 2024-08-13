@@ -71,22 +71,36 @@ int main( ){
     OptimizationAlgorithm algorithm(ocp);     // the optimization algorithm
 
 	// set up a logging object and flush it into the algorithm
-	LogRecord logRecord(LOG_AT_EACH_ITERATION);
-	logRecord << LOG_KKT_TOLERANCE;
-	algorithm << logRecord;
+	LogRecord logRecord_state(LOG_AT_END);
+    LogRecord logRecord_input(LOG_AT_END);
+	logRecord_state << LOG_DIFFERENTIAL_STATES;
+    logRecord_input << LOG_CONTROLS;
+	algorithm << logRecord_state;
+    algorithm << logRecord_input;
+    
 
     algorithm.solve();                        // solves the problem.
 
 	// get the logging object back and print it
-	algorithm.getLogRecord(logRecord);
+	algorithm.getLogRecord(logRecord_state);
+    algorithm.getLogRecord(logRecord_input);
 
-    std::ofstream file("log.txt");
-    if (file.is_open()) {
-        logRecord.print(file);
-        file.close();
-        std::cout << "Log has been saved to log.txt" << std::endl;
+    std::ofstream file_state("log_state.txt");
+    if (file_state.is_open()) {
+        logRecord_state.print(file_state);
+        file_state.close();
+        std::cout << "Log has been saved to log_state.txt" << std::endl;
     } else {
-        std::cerr << "Unable to open file" << std::endl;
+        std::cerr << "Unable to open file_state" << std::endl;
+    }
+
+    std::ofstream file_input("log_input.txt");
+    if (file_input.is_open()) {
+        logRecord_input.print(file_input);
+        file_input.close();
+        std::cout << "Log has been saved to log_input.txt" << std::endl;
+    } else {
+        std::cerr << "Unable to open file_input" << std::endl;
     }
 
     return 0;

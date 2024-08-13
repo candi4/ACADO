@@ -14,6 +14,8 @@ set(CMAKE_C_COMPILER_ID "GNU")
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH
   "/usr/include/python3.8"
+  "../."
+  "/usr/local/include/acado"
   "../MPC_SOLVER"
   "../MPC_SOLVER/qpoases/SRC"
   "../MPC_SOLVER/qpoases/INCLUDE"
@@ -36,6 +38,8 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/include/python3.8"
+  "../."
+  "/usr/local/include/acado"
   "../MPC_SOLVER"
   "../MPC_SOLVER/qpoases/SRC"
   "../MPC_SOLVER/qpoases/INCLUDE"

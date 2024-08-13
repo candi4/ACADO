@@ -11,6 +11,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.16.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.16.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.16.3/CMakeSystem.cmake"
+  "/usr/local/share/acado/cmake/ACADOConfig.cmake"
   "/usr/local/share/eigen3/cmake/Eigen3Config.cmake"
   "/usr/local/share/eigen3/cmake/Eigen3ConfigVersion.cmake"
   "/usr/local/share/eigen3/cmake/Eigen3Targets.cmake"
@@ -124,6 +125,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
+  "CMakeFiles/planar_drone_codegen.dir/DependInfo.cmake"
   "CMakeFiles/planar_drone_20.dir/DependInfo.cmake"
   "CMakeFiles/mpc_solver.dir/DependInfo.cmake"
   )

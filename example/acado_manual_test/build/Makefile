@@ -150,6 +150,19 @@ controller/fast:
 .PHONY : controller/fast
 
 #=============================================================================
+# Target rules for targets named prob1
+
+# Build rule for target.
+prob1: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 prob1
+.PHONY : prob1
+
+# fast build rule for target.
+prob1/fast:
+	$(MAKE) -f CMakeFiles/prob1.dir/build.make CMakeFiles/prob1.dir/build
+.PHONY : prob1/fast
+
+#=============================================================================
 # Target rules for targets named process_advanced
 
 # Build rule for target.
@@ -1110,6 +1123,33 @@ src/chapter8/simulation_mpc_controller.cpp.s:
 	$(MAKE) -f CMakeFiles/simulation_mpc_controller.dir/build.make CMakeFiles/simulation_mpc_controller.dir/src/chapter8/simulation_mpc_controller.cpp.s
 .PHONY : src/chapter8/simulation_mpc_controller.cpp.s
 
+src/practice/prob1.o: src/practice/prob1.cpp.o
+
+.PHONY : src/practice/prob1.o
+
+# target to build an object file
+src/practice/prob1.cpp.o:
+	$(MAKE) -f CMakeFiles/prob1.dir/build.make CMakeFiles/prob1.dir/src/practice/prob1.cpp.o
+.PHONY : src/practice/prob1.cpp.o
+
+src/practice/prob1.i: src/practice/prob1.cpp.i
+
+.PHONY : src/practice/prob1.i
+
+# target to preprocess a source file
+src/practice/prob1.cpp.i:
+	$(MAKE) -f CMakeFiles/prob1.dir/build.make CMakeFiles/prob1.dir/src/practice/prob1.cpp.i
+.PHONY : src/practice/prob1.cpp.i
+
+src/practice/prob1.s: src/practice/prob1.cpp.s
+
+.PHONY : src/practice/prob1.s
+
+# target to generate assembly for a file
+src/practice/prob1.cpp.s:
+	$(MAKE) -f CMakeFiles/prob1.dir/build.make CMakeFiles/prob1.dir/src/practice/prob1.cpp.s
+.PHONY : src/practice/prob1.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -1121,6 +1161,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... controller_classical"
 	@echo "... controller"
+	@echo "... prob1"
 	@echo "... process_advanced"
 	@echo "... process"
 	@echo "... plug_flow_reactor_ws"
@@ -1218,6 +1259,9 @@ help:
 	@echo "... src/chapter8/simulation_mpc_controller.o"
 	@echo "... src/chapter8/simulation_mpc_controller.i"
 	@echo "... src/chapter8/simulation_mpc_controller.s"
+	@echo "... src/practice/prob1.o"
+	@echo "... src/practice/prob1.i"
+	@echo "... src/practice/prob1.s"
 .PHONY : help
 
 

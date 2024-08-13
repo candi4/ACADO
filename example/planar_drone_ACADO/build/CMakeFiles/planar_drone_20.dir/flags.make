@@ -6,5 +6,5 @@ CXX_FLAGS =   $(EIGEN_DEFINITIONS)
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/usr/include/python3.8 -I/home/hojun/project/ACADO/example/planar_drone_ACADO/MPC_SOLVER -I/home/hojun/project/ACADO/example/planar_drone_ACADO/MPC_SOLVER/qpoases/SRC -I/home/hojun/project/ACADO/example/planar_drone_ACADO/MPC_SOLVER/qpoases/INCLUDE 
+CXX_INCLUDES = -I/usr/include/python3.8 -I/home/hojun/project/ACADO/example/planar_drone_ACADO/. -I/usr/local/include/acado -I/home/hojun/project/ACADO/example/planar_drone_ACADO/MPC_SOLVER -I/home/hojun/project/ACADO/example/planar_drone_ACADO/MPC_SOLVER/qpoases/SRC -I/home/hojun/project/ACADO/example/planar_drone_ACADO/MPC_SOLVER/qpoases/INCLUDE 
 

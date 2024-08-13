@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /home/hojun/project/ACADO/example/planar_drone_ACADO/build
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/planar_drone_codegen.dir/all
 all: CMakeFiles/planar_drone_20.dir/all
 all: CMakeFiles/mpc_solver.dir/all
 
@@ -64,10 +65,38 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/planar_drone_codegen.dir/clean
 clean: CMakeFiles/planar_drone_20.dir/clean
 clean: CMakeFiles/mpc_solver.dir/clean
 
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/planar_drone_codegen.dir
+
+# All Build rule for target.
+CMakeFiles/planar_drone_codegen.dir/all: CMakeFiles/mpc_solver.dir/all
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/depend
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/hojun/project/ACADO/example/planar_drone_ACADO/build/CMakeFiles --progress-num=18,19 "Built target planar_drone_codegen"
+.PHONY : CMakeFiles/planar_drone_codegen.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/planar_drone_codegen.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hojun/project/ACADO/example/planar_drone_ACADO/build/CMakeFiles 17
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/planar_drone_codegen.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/hojun/project/ACADO/example/planar_drone_ACADO/build/CMakeFiles 0
+.PHONY : CMakeFiles/planar_drone_codegen.dir/rule
+
+# Convenience name for target.
+planar_drone_codegen: CMakeFiles/planar_drone_codegen.dir/rule
+
+.PHONY : planar_drone_codegen
+
+# clean rule for target.
+CMakeFiles/planar_drone_codegen.dir/clean:
+	$(MAKE) -f CMakeFiles/planar_drone_codegen.dir/build.make CMakeFiles/planar_drone_codegen.dir/clean
+.PHONY : CMakeFiles/planar_drone_codegen.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/planar_drone_20.dir

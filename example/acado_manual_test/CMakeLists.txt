@@ -44,6 +44,7 @@ set(SOURCE_FILES
     src/chapter8/simulation_mpc_controller.cpp
     src/chapter8/simulation_classical_controller.cpp
 
+    src/practice/prob1.cpp
 )
 
 function(create_executable target_name source_path)
@@ -94,6 +95,9 @@ create_executable(controller_classical src/chapter7/controller_classical.cpp)
 # chapter8
 create_executable(simulation_mpc_controller src/chapter8/simulation_mpc_controller.cpp)
 create_executable(simulation_classical_controller src/chapter8/simulation_classical_controller.cpp)
+
+# practice
+create_executable(prob1 src/practice/prob1.cpp)
 
 add_definitions(${EIGEN_DEFINITIONS})
 
