@@ -196,7 +196,83 @@ void plot(std::vector<float> time, std::vector<float> x1, std::vector<float> x2,
     plt::ylabel("Frequency");
 
 
-    plt::show();
+}
+
+
+// plot x1 - x2
+void plot_error(auto time1, auto x1, 
+                auto time2, auto x2)
+{
+    std::vector<float> time;
+    std::vector<float> x_diff;
+    float t = -1; // for plot
+    
+    int idx1 = 0; // for time1
+    int idx2 = 0; // for time2
+    int size1 = time1.size();
+    int size2 = time2.size();
+
+    
+    while (idx1 < size1 && idx2 < size2){
+        // Get information
+        float t1 = time1[idx1];
+        float t2 = time2[idx2];
+        float x1_t = x1[idx1];
+        float x2_t = x2[idx2];
+        // Arrange via time
+        if (t1 < t2){
+            // Use time1
+            t = t1;
+            idx1++;
+        }
+        else if (t1 > t2){
+            // Use time2
+            t = t2;
+            idx2++;
+        }
+        else{
+            // Use time1=time2
+            t = t1;
+            idx1++;
+            idx2++;
+        }
+        // Stack information for plotting
+        time.push_back(t);
+        x_diff.push_back(x1_t - x2_t);
+    }
+    // Use remaining elements
+    while (idx1 < size1)
+    {
+        idx2--;
+        // Get information
+        float t1 = time1[idx1];
+        float t2 = time2[idx2];
+        float x1_t = x1[idx1];
+        float x2_t = x2[idx2];
+        t = t1;
+        idx1++;
+        // Stack information for plotting
+        time.push_back(t);
+        x_diff.push_back(x1_t - x2_t);
+    }
+    while (idx2 < size2)
+    {
+        idx1--;
+        // Get information
+        float t1 = time1[idx1];
+        float t2 = time2[idx2];
+        float x1_t = x1[idx1];
+        float x2_t = x2[idx2];
+        t = t2;
+        idx2++;
+        // Stack information for plotting
+        time.push_back(t);
+        x_diff.push_back(x1_t - x2_t);
+    }
+    
+
+
+    plt::named_plot("x_diff", time, x_diff);
 }
 
 
@@ -334,6 +410,40 @@ int  main()
 
     plot(time, x1, x2, x3, control1, control2, computation_time);
 
+
+    // plot refer - real
+    plot_error(timesteps, x_values, time, x1);
+    
+
+
+    plt::figure();
+    plt::subplot(3,1,1);
+    plt::title("State trajectory error");
+    plot_error(timesteps, x_values, time, x1);
+    plt::ylabel("x");
+
+    plt::subplot(3,1,2);
+    plot_error(timesteps, y_values, time, x2);
+    plt::ylabel("y");
+
+    plt::subplot(3,1,3);
+    plot_error(timesteps, theta_values, time, x3);
+    plt::ylabel("theta");
+    plt::xlabel("Time (s)");
+
+
+    plt::figure();
+    plt::subplot(2,1,1);
+    plt::title("Control input trajectory error");
+    plot_error(timesteps, v_values, time, control1);
+    plt::ylabel("v");
+
+    plt::subplot(2,1,2);
+    plot_error(timesteps, w_values, time, control2);
+    plt::ylabel("w");
+    plt::xlabel("Time (s)");
+
+    plt::show();
 
     return 0;
 
