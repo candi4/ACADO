@@ -16,10 +16,10 @@
 
 namespace plt = matplotlibcpp;
 
-#include "prob2_mpc_export/acado_qpoases_interface.hpp"
+#include "include/prob2_mpc_export/acado_qpoases_interface.hpp"
 extern "C"{
-    #include "prob2_mpc_export/acado_common.h"
-    #include "prob2_mpc_export/acado_auxiliary_functions.h"
+    #include "include/prob2_mpc_export/acado_common.h"
+    #include "include/prob2_mpc_export/acado_auxiliary_functions.h"
 }
 
 
@@ -79,13 +79,14 @@ Eigen::Matrix<float, 3, 1> update_RK4(Eigen::Matrix<float, 3, 1> x, Eigen::Matri
     coeff3 << planar_drone_dnm(x + 0.5*Ts*coeff2, u);
     coeff4 << planar_drone_dnm(x + Ts*coeff3, u);
 
-    x_next = x + Ts*0.167*(coeff1 + 2*coeff2 + 2*coeff3 + coeff4);
+    x_next = x + Ts*(coeff1 + 2*coeff2 + 2*coeff3 + coeff4)/6.0;
 
     return x_next;
 
 }
 
-Eigen::Matrix<float, 2, 1> runAcado(Eigen::Matrix<float, 3, 1> current_state, Eigen::Matrix<float, 3, 1> reference_state, Eigen::Matrix<float, 2, 1> reference_control)
+Eigen::Matrix<float, 2, 1> runAcado(Eigen::Matrix<float, 3, 1> current_state, Eigen::Matrix<float, 3, 1> reference_state, Eigen::Matrix<float, 2, 1> reference_control,
+                                    Eigen::Matrix<float, 3, 1> reference_state_next, Eigen::Matrix<float, 2, 1> reference_control_next)
 {
 
 	int NY_2 = NY*NY;
@@ -97,8 +98,8 @@ Eigen::Matrix<float, 2, 1> runAcado(Eigen::Matrix<float, 3, 1> current_state, Ei
         acadoVariables.W[(NY+1) * 2 + NY_2 * i] = 10;
 
 		// {u}
-        acadoVariables.W[(NY+1) * 3 + NY_2 * i] = 1;
-        acadoVariables.W[(NY+1) * 4 + NY_2 * i] = 1;
+        acadoVariables.W[(NY+1) * 3 + NY_2 * i] = 0.1;
+        acadoVariables.W[(NY+1) * 4 + NY_2 * i] = 0.1;
 
     }
 
@@ -116,18 +117,21 @@ Eigen::Matrix<float, 2, 1> runAcado(Eigen::Matrix<float, 3, 1> current_state, Ei
 
 	// Set reference
 	for (int i = 0; i < NH; ++i) {
-		acadoVariables.y[i * NY + 0] = reference_state(0);
-		acadoVariables.y[i * NY + 1] = reference_state(1);
-		acadoVariables.y[i * NY + 2] = reference_state(2);
+        float alpha = i / NH;
+        Eigen::Matrix<float, 3, 1> reference_state_interp = alpha*reference_state_next + (1-alpha)*reference_state;
+        Eigen::Matrix<float, 2, 1> reference_control_interp = alpha*reference_control_next + (1-alpha)*reference_control;
+		acadoVariables.y[i * NY + 0] = reference_state_interp(0);
+		acadoVariables.y[i * NY + 1] = reference_state_interp(1);
+		acadoVariables.y[i * NY + 2] = reference_state_interp(2);
 
-        acadoVariables.y[i * NY + 3] = reference_control(0);
-        acadoVariables.y[i * NY + 4] = reference_control(1);
+        acadoVariables.y[i * NY + 3] = reference_control_interp(0);
+        acadoVariables.y[i * NY + 4] = reference_control_interp(1);
 
 	}
 
-	acadoVariables.yN[0] = reference_state(0);
-	acadoVariables.yN[1] = reference_state(1);
-	acadoVariables.yN[2] = reference_state(2);
+	acadoVariables.yN[0] = reference_state_next(0);
+	acadoVariables.yN[1] = reference_state_next(1);
+	acadoVariables.yN[2] = reference_state_next(2);
 
 	// bound value
 	for (int i=0; i<NH; i++){
@@ -157,36 +161,82 @@ Eigen::Matrix<float, 2, 1> runAcado(Eigen::Matrix<float, 3, 1> current_state, Ei
 
 }
 
+
+
+class Reference{
+public:
+    std::vector<double> timesteps;
+    std::vector<double> x_values;
+    std::vector<double> y_values;
+    std::vector<double> theta_values;
+    std::vector<double> v_values;
+    std::vector<double> w_values;
+    void init(std::vector<double> _timesteps, std::vector<double> _x_values, std::vector<double> _y_values, std::vector<double> _theta_values, 
+              std::vector<double> _v_values, std::vector<double> _w_values)
+    {
+        timesteps = _timesteps;
+        x_values = _x_values;
+        y_values = _y_values;
+        theta_values = _theta_values;
+        v_values = _v_values;
+        w_values = _w_values;
+        double dt = timesteps[1] - timesteps[0];
+        for (int i=0; i < NH; i++){
+            timesteps.push_back(timesteps.back()+dt);
+            x_values.push_back(x_values.back());
+            y_values.push_back(y_values.back());
+            theta_values.push_back(theta_values.back());
+            v_values.push_back(v_values.back());
+            w_values.push_back(w_values.back());
+        }
+    }
+
+};
+
+
+
 void plot(std::vector<float> time, std::vector<float> x1, std::vector<float> x2, std::vector<float> x3, std::vector<float> u1, std::vector<float> u2, 
-        std::vector<float> computation_time)
+        std::vector<float> computation_time,
+        std::vector<double> timesteps, std::vector<double>  x_values, std::vector<double>  y_values, std::vector<double>  theta_values, std::vector<double>  v_values, std::vector<double>  w_values
+        )
 {
 
     plt::figure();
     plt::subplot(3,1,1);
     plt::title("State");
     plt::named_plot("x", time, x1);
+    plt::named_plot("x_refer", timesteps, x_values);
     plt::ylabel("x");
+    plt::legend();
 
     plt::subplot(3,1,2);
     plt::named_plot("y", time, x2);
+    plt::named_plot("y_refer", timesteps, y_values);
     plt::ylabel("y");
+    plt::legend();
 
     plt::subplot(3,1,3);
     plt::named_plot("theta", time, x3);
+    plt::named_plot("theta_refer", timesteps, theta_values);
     plt::ylabel("theta");
     plt::xlabel("Time (s)");
+    plt::legend();
 
 
     plt::figure();
     plt::subplot(2,1,1);
     plt::title("Control input");
     plt::named_plot("v", time, u1);
+    plt::named_plot("v_refer", timesteps, v_values);
     plt::ylabel("v");
+    plt::legend();
 
     plt::subplot(2,1,2);
     plt::named_plot("w", time, u2);
+    plt::named_plot("w_refer", timesteps, w_values);
     plt::ylabel("w");
     plt::xlabel("Time (s)");
+    plt::legend();
 
     plt::figure();
     plt::hist(computation_time, 5);
@@ -199,18 +249,30 @@ void plot(std::vector<float> time, std::vector<float> x1, std::vector<float> x2,
 }
 
 
+
+
+
+
+
+
 // plot x1 - x2
-void calculate_error(auto time1, auto x1, 
-                     auto time2, auto x2)
+void calculate_error(std::vector<double> time1, std::vector<double> x1, 
+                     std::vector<float> time2, std::vector<float> x2)
 {
     std::vector<float> time;
     std::vector<float> x_diff;
     float t = -1; // for plot
     
-    int idx1 = 0; // for time1
-    int idx2 = 0; // for time2
+    int idx1 = 1; // for time1
+    int idx2 = 1; // for time2
     int size1 = time1.size();
     int size2 = time2.size();
+
+    float t_previous = -1;
+    float t1 = time1[0];
+    float t2 = time2[0];
+    float x1_t = x1[0];
+    float x2_t = x2[0];
 
     
     while (idx1 < size1 && idx2 < size2){
@@ -276,8 +338,8 @@ void calculate_error(auto time1, auto x1,
 }
 
 // plot refer - real
-void plot_error(auto timesteps, auto x_values, auto y_values, auto theta_values, auto v_values, auto w_values,
-                auto time,      auto x1, auto x2, auto x3, auto control1, auto control2)
+void plot_error(std::vector<double> timesteps, std::vector<double> x_values, std::vector<double> y_values, std::vector<double> theta_values, std::vector<double> v_values, std::vector<double> w_values,
+                std::vector<float> time,      std::vector<float> x1, std::vector<float> x2, std::vector<float> x3, std::vector<float> control1, std::vector<float> control2)
 {
     
     plt::figure();
@@ -367,6 +429,10 @@ int  main()
 
     inputFile.close();    
 
+
+    Reference reference;
+    reference.init(timesteps, x_values, y_values, theta_values, v_values, w_values);
+
     std::vector<float> time;
     std::vector<float> x1;
     std::vector<float> x2;
@@ -391,8 +457,8 @@ int  main()
         acadoVariables.W[(NY+1) * 2 + NY_2 * i] = 10;
 
 		// {u}
-        acadoVariables.W[(NY+1) * 3 + NY_2 * i] = 0.01;
-        acadoVariables.W[(NY+1) * 4 + NY_2 * i] = 0.01;
+        acadoVariables.W[(NY+1) * 3 + NY_2 * i] = 0.;
+        acadoVariables.W[(NY+1) * 4 + NY_2 * i] = 0.;
 
     }
 
@@ -402,38 +468,42 @@ int  main()
     acadoVariables.WN[8] = 10;
 
     int r = 1;
-    Eigen::Matrix<float, 3, 1> x_ref_prior;
-    Eigen::Matrix<float, 2, 1> u_ref_prior;
-    Eigen::Matrix<float, 3, 1> x_ref_interp;
-    Eigen::Matrix<float, 2, 1> u_ref_interp;
-    x_ref_prior = (Eigen::Matrix<float, 3, 1>() << x_values[0], y_values[0], theta_values[0]).finished();
-    u_ref_prior = (Eigen::Matrix<float, 2, 1>() << v_values[0], w_values[0]).finished();
+    Eigen::Matrix<float, 3, 1> x_ref_previous;
+    Eigen::Matrix<float, 2, 1> u_ref_previous;
+    Eigen::Matrix<float, 3, 1> x_ref_interp, x_ref_interp_previous;
+    Eigen::Matrix<float, 2, 1> u_ref_interp, u_ref_interp_previous;
+    x_ref_previous = (Eigen::Matrix<float, 3, 1>() << x_values[0], y_values[0], theta_values[0]).finished();
+    u_ref_previous = (Eigen::Matrix<float, 2, 1>() << v_values[0], w_values[0]).finished();
+    x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[1], y_values[1], theta_values[1]).finished();
+    u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[1], w_values[1]).finished();
+    x_ref_interp = x_ref_previous;
+    u_ref_interp = u_ref_previous;
+
 
     for (int t=0; t<T_final; t++)
     {
 	    uint64_t start_test = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         
 
-        x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[r], y_values[r], theta_values[r]).finished();
-        u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[r], w_values[r]).finished();
-        
-
-        if (t%5 == 0)
-        {
-            r++;
-            x_ref_prior = x_ref;
-            u_ref_prior = u_ref;
-            x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[r], y_values[r], theta_values[r]).finished();
-            u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[r], w_values[r]).finished();
-        }
 
         // interploation
-        float alpha = float(t%5)/5;
-        x_ref_interp = alpha*x_ref + (1-alpha)*x_ref_prior;
-        u_ref_interp = alpha*u_ref + (1-alpha)*u_ref_prior;
-        std::cout << "alpha=" << alpha << "\n0";
+        float alpha = t%5/5.0;
+        x_ref_interp_previous = x_ref_interp;
+        u_ref_interp_previous = u_ref_interp;
+        x_ref_interp = alpha*x_ref + (1-alpha)*x_ref_previous;
+        u_ref_interp = alpha*u_ref + (1-alpha)*u_ref_previous;
+        if (alpha == 0){
+            r++;
+            x_ref_previous = x_ref;
+            u_ref_previous = u_ref;
+            if (T_final-t > 8){
+            x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[r], y_values[r], theta_values[r]).finished();
+            u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[r], w_values[r]).finished();
+            }
+        }
+        std::cout << "alpha=" << alpha << "\n";
         
-        u = runAcado(x, x_ref_interp, u_ref_interp);
+        u = runAcado(x, x_ref_interp_previous, u_ref_interp_previous, x_ref_interp, u_ref_interp);
         uint64_t stop_test = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         computation_time.push_back(stop_test - start_test); 
         computation_time_mean += stop_test - start_test;
@@ -454,13 +524,12 @@ int  main()
         control2.push_back(u(1));
     }
 
-    float T_final_float = T_final;
 
-    plot(time, x1, x2, x3, control1, control2, computation_time);
+    plot(time, x1, x2, x3, control1, control2, computation_time,
+         timesteps, x_values, y_values, theta_values, v_values, w_values);
 
     plot_error(timesteps, x_values, y_values, theta_values, v_values, w_values,
                time,      x1,       x2,       x3,           control1, control2);
-
 
     plt::show();
 
