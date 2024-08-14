@@ -200,8 +200,8 @@ void plot(std::vector<float> time, std::vector<float> x1, std::vector<float> x2,
 
 
 // plot x1 - x2
-void plot_error(auto time1, auto x1, 
-                auto time2, auto x2)
+void calculate_error(auto time1, auto x1, 
+                     auto time2, auto x2)
 {
     std::vector<float> time;
     std::vector<float> x_diff;
@@ -275,6 +275,38 @@ void plot_error(auto time1, auto x1,
     plt::named_plot("x_diff", time, x_diff);
 }
 
+// plot refer - real
+void plot_error(auto timesteps, auto x_values, auto y_values, auto theta_values, auto v_values, auto w_values,
+                auto time,      auto x1, auto x2, auto x3, auto control1, auto control2)
+{
+    
+    plt::figure();
+    plt::subplot(3,1,1);
+    plt::title("State trajectory error");
+    calculate_error(timesteps, x_values, time, x1);
+    plt::ylabel("x");
+
+    plt::subplot(3,1,2);
+    calculate_error(timesteps, y_values, time, x2);
+    plt::ylabel("y");
+
+    plt::subplot(3,1,3);
+    calculate_error(timesteps, theta_values, time, x3);
+    plt::ylabel("theta");
+    plt::xlabel("Time (s)");
+
+
+    plt::figure();
+    plt::subplot(2,1,1);
+    plt::title("Control input trajectory error");
+    calculate_error(timesteps, v_values, time, control1);
+    plt::ylabel("v");
+
+    plt::subplot(2,1,2);
+    calculate_error(timesteps, w_values, time, control2);
+    plt::ylabel("w");
+    plt::xlabel("Time (s)");
+}
 
 
 int  main()
@@ -369,23 +401,39 @@ int  main()
     acadoVariables.WN[4] = 10;
     acadoVariables.WN[8] = 10;
 
-    int r = 0;
+    int r = 1;
+    Eigen::Matrix<float, 3, 1> x_ref_prior;
+    Eigen::Matrix<float, 2, 1> u_ref_prior;
+    Eigen::Matrix<float, 3, 1> x_ref_interp;
+    Eigen::Matrix<float, 2, 1> u_ref_interp;
+    x_ref_prior = (Eigen::Matrix<float, 3, 1>() << x_values[0], y_values[0], theta_values[0]).finished();
+    u_ref_prior = (Eigen::Matrix<float, 2, 1>() << v_values[0], w_values[0]).finished();
 
     for (int t=0; t<T_final; t++)
     {
 	    uint64_t start_test = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         
-        x_ref = {x_values[r], y_values[r], theta_values[r]};
+
+        x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[r], y_values[r], theta_values[r]).finished();
         u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[r], w_values[r]).finished();
+        
 
         if (t%5 == 0)
         {
-           r++;
-           x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[r], y_values[r], theta_values[r]).finished();
-           u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[r], w_values[r]).finished();
+            r++;
+            x_ref_prior = x_ref;
+            u_ref_prior = u_ref;
+            x_ref = (Eigen::Matrix<float, 3, 1>() << x_values[r], y_values[r], theta_values[r]).finished();
+            u_ref = (Eigen::Matrix<float, 2, 1>() << v_values[r], w_values[r]).finished();
         }
+
+        // interploation
+        float alpha = float(t%5)/5;
+        x_ref_interp = alpha*x_ref + (1-alpha)*x_ref_prior;
+        u_ref_interp = alpha*u_ref + (1-alpha)*u_ref_prior;
+        std::cout << "alpha=" << alpha << "\n0";
         
-        u = runAcado(x, x_ref, u_ref);
+        u = runAcado(x, x_ref_interp, u_ref_interp);
         uint64_t stop_test = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
         computation_time.push_back(stop_test - start_test); 
         computation_time_mean += stop_test - start_test;
@@ -410,38 +458,9 @@ int  main()
 
     plot(time, x1, x2, x3, control1, control2, computation_time);
 
+    plot_error(timesteps, x_values, y_values, theta_values, v_values, w_values,
+               time,      x1,       x2,       x3,           control1, control2);
 
-    // plot refer - real
-    plot_error(timesteps, x_values, time, x1);
-    
-
-
-    plt::figure();
-    plt::subplot(3,1,1);
-    plt::title("State trajectory error");
-    plot_error(timesteps, x_values, time, x1);
-    plt::ylabel("x");
-
-    plt::subplot(3,1,2);
-    plot_error(timesteps, y_values, time, x2);
-    plt::ylabel("y");
-
-    plt::subplot(3,1,3);
-    plot_error(timesteps, theta_values, time, x3);
-    plt::ylabel("theta");
-    plt::xlabel("Time (s)");
-
-
-    plt::figure();
-    plt::subplot(2,1,1);
-    plt::title("Control input trajectory error");
-    plot_error(timesteps, v_values, time, control1);
-    plt::ylabel("v");
-
-    plt::subplot(2,1,2);
-    plot_error(timesteps, w_values, time, control2);
-    plt::ylabel("w");
-    plt::xlabel("Time (s)");
 
     plt::show();
 
