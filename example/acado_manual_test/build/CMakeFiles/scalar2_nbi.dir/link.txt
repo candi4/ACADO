@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/scalar2_nbi.dir/src/chapter4/scalar2_nbi.cpp.o  -o scalar2_nbi  -Wl,-rpath,/home/hojun/ACADOtoolkit/build/lib /home/hojun/ACADOtoolkit/build/lib/libacado_toolkit_s.so /usr/lib/x86_64-linux-gnu/libpython3.8.so 
